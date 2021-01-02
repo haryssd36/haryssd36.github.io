@@ -3,7 +3,6 @@
 <head>
     <title></title>
     <style>
-        
         * {
             margin: 0;
             padding: 0;
@@ -20,59 +19,70 @@
 
     <h2>Main Objective of this is to find your exact location</h2>
 
+    <p>Get direction to the places below</p>
+    
     <div>
-        <label>Username</label>
-        <input type-"text">
+        <button onclick="setDestination('UTHM')">UTHM</button>
+        <button onclick="setDestination('UTM')">UTM</button>
+        <button onclick="setDestination('USM')">USM</button>
     </div>
 
     <div id="map"></div>
 
     <script>
-        function initMap() {
+        var origin = {};
+        var destination = {};
+        var map = null;
+        var marker = null;
+
+        async function initMap() {
             var location = { lat: 4.210484, lng: 101.975769 };
-            var map = new google.maps.Map(document.getElementById("map"), {
+
+            // initiate map
+            map = new google.maps.Map(document.getElementById("map"), {
                 zoom: 8,
                 center: location
             });
 
-            var marker = new google.maps.Marker({
+            // initiate marker
+            marker = new google.maps.Marker({
                 position: location,
                 map: map
             });
+            
+            // get user location
+            getGeoLocation(setOrigin);
 
-            getGeoLocation(map);
+            // initialize direction api
+            initDirection(map);
+        }
+        
+        function setOrigin(lat, lng) {
+            origin = { lat, lng };
+            setLocation(map, marker, origin);
         }
 
-        function getGeoLocation(map) {
-            infoWindow = new google.maps.InfoWindow();
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const pos = {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude,
-                        };
-                        infoWindow.setPosition(pos);
-                        infoWindow.setContent("Location found.");
-                        infoWindow.open(map);
-                        map.setCenter(pos);
-                        var marker = new google.maps.Marker({
-                            position: location,
-                            map: map
-                        });
-
-                    },
-                    () => {
-                        handleLocationError(true, infoWindow, map.getCenter());
-                    }
-                );
-            } else {
-                // Browser doesn't support Geolocation
-                handleLocationError(false, infoWindow, map.getCenter());
+        function setDestination(place) {
+            switch (place) {
+                case 'UTHM':
+                    destination = {lat: 2.148627908205986, lng: 102.73078452914673};
+                    break;
+                case 'USM':
+                    destination = {lat: 5.358699830581387, lng: 100.30234892130905};
+                    break;
+                case 'UTM':
+                    destination = {lat: 1.559242806198061, lng: 103.63837028513986};
+                    break;
+                default:
+                    break;
             }
+
+            getDirection(origin, destination);
         }
     </script>
+
+    <script src="/modules/direction.js"></script>
+    <script src="/modules/geoLocation.js"></script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAsgRHHiy3OnG4Q2l85Ky4BHjhT_jzApTU&callback=initMap"></script>
 
 </body>
